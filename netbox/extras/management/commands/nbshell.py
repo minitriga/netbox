@@ -52,6 +52,15 @@ class Command(BaseCommand):
             except KeyError:
                 pass
 
+        # Gather plugin models
+        if settings.PLUGINS:
+            plugins = [apps.get_app_config(plugin) for plugin in settings.PLUGINS]
+            for plugin in plugins:
+                self.django_models[plugin.name] = []
+                for model in plugin.get_models():
+                    namespace[model.__name__] = model
+                    self.django_models[plugin.name].append(model.__name__)
+
         # Additional objects to include
         namespace['ContentType'] = ContentType
         namespace['User'] = User
